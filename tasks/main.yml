@@ -1,0 +1,25 @@
+---
+
+- name: Edit firewalld for Portainer port
+  firewalld:
+    port: "{{ portainer_publish_port }}/tcp"
+    permanent: true
+    state: enabled
+  notify: restart firewalld
+
+- name: Create portainer storage  
+  file:
+    path: "{{ portainer_storage_directory }}"
+    state: directory
+
+- name: Start Portainer
+  docker: 
+    image: "{{ portainer_image_name }}"
+    state: started
+    name: "{{ portainer_container_name }}"
+    restart_policy: unless-stopped
+    volumes:
+      - "{{ portainer_storage_directory }}:/data"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    ports:
+      - "{{ portainer_publish_port }}:9000"

@@ -20,6 +20,15 @@
       published_ports:
         - "127.0.0.1:9000:9000"
 
+  - name: Copy nginx configs
+    copy: 
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+    with_items:
+      - { src: portainer.conf, dest: /etc/nginx/default.d/portainer.conf }
+      - { src: portainer_upstream.conf, dest: /etc/nginx/conf.d/portainer_upstream.conf }
+    notify: restart nginx
+
   when:
     - env == "production"
 
